@@ -1,124 +1,173 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WK 2026 Premium Fan Hub</title>
-  <meta name="description" content="Professionele WK 2026 fanwebsite met echte groepsdata, speelschema, voorspellingen, standen, bracket en premium voetbaldesign.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WK 2026 Fan Hub</title>
+<meta name="description" content="WK 2026 fanwebsite met speelschema, groepen, voorspellingen en standen.">
+<style>
+:root {
+  --bg:#07120d; --card:#0f2218; --card2:#142c20; --text:#f7fff9; --muted:#b3c8ba;
+  --green:#18d26e; --green2:#0b8c49; --gold:#ffd166; --line:rgba(255,255,255,.12); --red:#ff6b6b;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:
+radial-gradient(circle at 20% 0%,rgba(24,210,110,.22),transparent 30%),
+radial-gradient(circle at 80% 0%,rgba(255,209,102,.14),transparent 28%),
+linear-gradient(180deg,#06100b,#07120d 45%,#030705);}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.13;background:
+linear-gradient(90deg,transparent 49%,rgba(255,255,255,.35) 50%,transparent 51%),
+repeating-linear-gradient(90deg,rgba(24,210,110,.16) 0 90px,rgba(255,255,255,.04) 90px 180px);}
+header{position:sticky;top:0;z-index:10;background:rgba(3,7,5,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{max-width:1180px;margin:auto;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.brand{font-weight:1000;color:var(--text);text-decoration:none;font-size:1.1rem}
+nav{display:flex;gap:14px;flex-wrap:wrap} nav a{color:var(--muted);text-decoration:none;font-weight:800;font-size:.92rem} nav a:hover{color:var(--gold)}
+.hero,.section{max-width:1180px;margin:auto;padding:70px 18px;position:relative}
+.hero{min-height:660px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:28px}
+.kicker{color:var(--gold);text-transform:uppercase;letter-spacing:2px;font-weight:1000;font-size:.78rem;margin:0 0 10px}
+h1{font-size:clamp(3.8rem,10vw,8.8rem);line-height:.82;margin:0 0 18px;font-weight:1000;letter-spacing:-5px;text-transform:uppercase}
+h1 span{color:var(--gold)} h2{font-size:clamp(2.1rem,5vw,4.2rem);line-height:.95;margin:0 0 18px;font-weight:1000;letter-spacing:-2px} h3{margin:0 0 12px}
+.lead{font-size:1.15rem;color:var(--muted);line-height:1.6;max-width:650px}
+.glass,.card,.match,.standing,.prediction,.stat,.round{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 60px rgba(0,0,0,.3)}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:560px;margin:26px 0}
+.countdown div{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center}
+.countdown b{display:block;color:var(--gold);font-size:2rem} .countdown small{color:var(--muted);font-weight:800}
+.btn{display:inline-flex;padding:13px 18px;border-radius:999px;text-decoration:none;font-weight:1000;margin-right:8px;border:1px solid var(--line)}
+.primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#021207} .ghost{color:var(--text);background:rgba(255,255,255,.07)}
+.hero-card{padding:28px;min-height:310px;overflow:hidden;position:relative} .hero-card:after{content:"⚽";position:absolute;right:-12px;bottom:-42px;font-size:180px;opacity:.12}
+.pitch{height:100px;border:2px solid rgba(255,255,255,.18);border-radius:16px;margin-top:24px;background:repeating-linear-gradient(90deg,rgba(24,210,110,.12) 0 55px,rgba(255,255,255,.035) 55px 110px);position:relative}
+.pitch:after{content:"";position:absolute;left:50%;top:50%;width:48px;height:48px;transform:translate(-50%,-50%);border:2px solid rgba(255,255,255,.25);border-radius:50%}
+.stats{max-width:1180px;margin:-35px auto 10px;padding:0 18px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{padding:20px} .stat b{display:block;font-size:2.4rem;color:var(--gold)} .stat span{color:var(--muted);font-weight:800}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .card{padding:18px} .card h3{color:var(--gold)}
+.team-row{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0} .team-row:last-child{border-bottom:0}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px} select,input{background:#06100b;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:11px 12px;font-weight:700}
+.matches{display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .match{padding:18px;position:relative;overflow:hidden} .match:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.meta{display:flex;justify-content:space-between;gap:8px;color:var(--gold);font-size:.78rem;font-weight:1000;text-transform:uppercase} .teams{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:20px 0;font-weight:1000} .teams div:last-child{text-align:right} .vs{color:var(--muted)} .venue{color:var(--muted);font-size:.9rem}
+.badge{padding:10px 13px;border-radius:999px;border:1px solid var(--line);font-weight:1000;background:rgba(255,255,255,.07)} .ok{color:#8cffbd;background:rgba(24,210,110,.14)} .bad{color:#ffb2b2;background:rgba(255,107,107,.12)}
+.notice{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.25);padding:14px 16px;border-radius:16px;color:#ffe4a3}
+.predictions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0} .prediction{display:grid;grid-template-columns:1fr 110px 1fr;gap:8px;align-items:center;padding:12px} .prediction strong:last-child{text-align:right} .scores{display:flex;gap:6px;justify-content:center} .scores input{width:50px;text-align:center}
+.standings{display:grid;grid-template-columns:repeat(2,1fr);gap:14px} .standing{padding:16px;overflow:auto} table{width:100%;border-collapse:collapse;min-width:520px} th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left} th{color:var(--gold);font-size:.78rem;text-transform:uppercase}
+.bracket{display:grid;grid-template-columns:repeat(5,250px);gap:14px;overflow-x:auto;padding-bottom:16px} .round{padding:18px;min-height:190px} .round h3{color:var(--gold)} .round p{color:var(--muted);font-weight:800}
+footer{text-align:center;color:var(--muted);padding:36px 18px;border-top:1px solid var(--line)}
+@media(max-width:850px){.hero{grid-template-columns:1fr;min-height:auto}.stats,.grid,.matches,.predictions,.standings{grid-template-columns:1fr}.countdown{grid-template-columns:repeat(2,1fr)}.section-head{display:block}.prediction{grid-template-columns:1fr;text-align:center}.prediction strong:last-child,.teams div:last-child{text-align:center}nav{justify-content:flex-end}h1{letter-spacing:-3px}}
+</style>
 </head>
 <body>
-  <div class="noise"></div>
-  <header class="topbar">
-    <a class="brand" href="#home"><span>⚽</span> WK26</a>
-    <button id="menuBtn" class="menu-btn">☰</button>
-    <nav id="nav">
-      <a href="#groepen">Groepen</a>
-      <a href="#schema">Speelschema</a>
-      <a href="#voorspellen">Voorspellen</a>
-      <a href="#bracket">Bracket</a>
-      <a href="#data">Datacheck</a>
-    </nav>
-  </header>
-
-  <main>
-    <section id="home" class="hero">
-      <div class="floodlight left"></div>
-      <div class="floodlight right"></div>
-      <div class="hero-copy">
-        <p class="kicker">Canada • Mexico • United States</p>
-        <h1>World Cup<br><span>2026</span></h1>
-        <p class="lead">Een premium Nederlandstalige WK-hub met echte groepsdata, wedstrijdschema, voorspellingen en automatische standen.</p>
-        <div class="countdown">
-          <div><b id="cd-days">0</b><small>Dagen</small></div>
-          <div><b id="cd-hours">0</b><small>Uur</small></div>
-          <div><b id="cd-mins">0</b><small>Min</small></div>
-          <div><b id="cd-secs">0</b><small>Sec</small></div>
-        </div>
-        <div class="actions">
-          <a class="btn primary" href="#schema">Bekijk wedstrijden</a>
-          <a class="btn secondary" href="#voorspellen">Start voorspellen</a>
-        </div>
-      </div>
-      <aside class="glass matchday-card">
-        <p class="kicker">Aftrap</p>
-        <h2>Mexico vs South Africa</h2>
-        <p>11 juni 2026 • Mexico City Stadium</p>
-        <div class="pitch-mini"><span></span></div>
-      </aside>
-    </section>
-
-    <section class="stats-bar">
-      <div><b>48</b><span>Teams</span></div>
-      <div><b>12</b><span>Groepen</span></div>
-      <div><b>104</b><span>Wedstrijden</span></div>
-      <div><b>16</b><span>Host cities</span></div>
-    </section>
-
-    <section id="groepen" class="section">
-      <div class="section-head">
-        <p class="kicker">Final Draw</p>
-        <h2>Groepen A t/m L</h2>
-      </div>
-      <div id="groupsGrid" class="groups-grid"></div>
-    </section>
-
-    <section id="schema" class="section">
-      <div class="section-head split">
-        <div>
-          <p class="kicker">Officiële groepsfase-data</p>
-          <h2>Speelschema</h2>
-        </div>
-        <div id="checkBadge" class="check-badge">Datacheck</div>
-      </div>
-      <div class="toolbar">
-        <select id="groupFilter"><option value="all">Alle groepen</option></select>
-        <input id="searchInput" type="search" placeholder="Zoek team of stadion...">
-      </div>
-      <div id="matchesGrid" class="matches-grid"></div>
-    </section>
-
-    <section id="voorspellen" class="section">
-      <div class="section-head">
-        <p class="kicker">Jouw voorspelling</p>
-        <h2>Scores invullen & standen berekenen</h2>
-      </div>
-      <p class="info">Scores worden lokaal in je browser opgeslagen. De stand sorteert op punten, doelsaldo en goals voor.</p>
-      <div id="predictionGrid" class="prediction-grid"></div>
-      <div id="standingsGrid" class="standings-grid"></div>
-    </section>
-
-    <section id="bracket" class="section">
-      <div class="section-head">
-        <p class="kicker">Knock-out</p>
-        <h2>Route naar de finale</h2>
-      </div>
-      <div class="bracket">
-        <div class="round"><h3>Ronde van 32</h3><p>28 juni – 3 juli</p><span>Groepswinnaars, nummers 2 en beste nummers 3</span></div>
-        <div class="round"><h3>Achtste finales</h3><p>4 – 7 juli</p><span>Laatste 16</span></div>
-        <div class="round"><h3>Kwartfinales</h3><p>9 – 11 juli</p><span>Laatste 8</span></div>
-        <div class="round"><h3>Halve finales</h3><p>14 – 15 juli</p><span>Alles of niets</span></div>
-        <div class="round final"><h3>Finale</h3><p>19 juli</p><span>Wereldkampioen 2026</span></div>
-      </div>
-    </section>
-
-    <section id="data" class="section">
-      <div class="section-head">
-        <p class="kicker">Kwaliteitscontrole</p>
-        <h2>Datacheck</h2>
-      </div>
-      <div id="dataPanel" class="glass data-panel"></div>
-    </section>
-  </main>
-
-  <footer>
-    <p>Niet-officiële fanwebsite. Data gebaseerd op gepubliceerde WK 2026-groepsfase-informatie; controleer officiële bronnen voor last-minute wijzigingen.</p>
-  </footer>
-
-  <script src="data.js"></script>
-  <script src="script.js"></script>
+<header><div class="nav"><a class="brand" href="#home">⚽ WK 2026 Fan Hub</a><nav><a href="#groepen">Groepen</a><a href="#schema">Speelschema</a><a href="#voorspellen">Voorspellen</a><a href="#bracket">Bracket</a></nav></div></header>
+<main>
+<section id="home" class="hero">
+<div>
+<p class="kicker">Canada • Mexico • Verenigde Staten</p>
+<h1>World Cup <span>2026</span></h1>
+<p class="lead">Een strakke, stabiele WK 2026 fanwebsite met groepsdata, speelschema, voorspellingen, standen en datacheck. Deze versie is één los HTML-bestand, dus de data kan niet verdwijnen door ontbrekende bestanden.</p>
+<div class="countdown"><div><b id="d">0</b><small>Dagen</small></div><div><b id="h">0</b><small>Uur</small></div><div><b id="m">0</b><small>Min</small></div><div><b id="s">0</b><small>Sec</small></div></div>
+<a class="btn primary" href="#schema">Bekijk speelschema</a><a class="btn ghost" href="#voorspellen">Vul voorspellingen in</a>
+</div>
+<aside class="glass hero-card"><p class="kicker">Openingswedstrijd</p><h2>Mexico vs South Africa</h2><p class="lead">11 juni 2026 • Mexico City Stadium</p><div class="pitch"></div></aside>
+</section>
+<section class="stats"><div class="stat"><b>48</b><span>Teams</span></div><div class="stat"><b>12</b><span>Groepen</span></div><div class="stat"><b>72</b><span>Groepswedstrijden</span></div><div class="stat"><b>104</b><span>Totaal wedstrijden</span></div></section>
+<section id="groepen" class="section"><div class="section-head"><div><p class="kicker">Final Draw</p><h2>Groepen</h2></div><div id="check" class="badge">Datacheck</div></div><div id="groups" class="grid"></div></section>
+<section id="schema" class="section"><div class="section-head"><div><p class="kicker">11 t/m 27 juni 2026</p><h2>Speelschema</h2></div></div><p class="notice">Let op: dit is een fanwebsite. Controleer bij officiële bronnen voor wijzigingen in tijden of venues.</p><div class="toolbar"><select id="groupFilter"><option value="all">Alle groepen</option></select><input id="search" type="search" placeholder="Zoek team of stadion"></div><div id="matches" class="matches"></div></section>
+<section id="voorspellen" class="section"><div class="section-head"><div><p class="kicker">Jouw voorspelling</p><h2>Scores & standen</h2></div></div><div id="predictions" class="predictions"></div><div id="standings" class="standings"></div></section>
+<section id="bracket" class="section"><div class="section-head"><div><p class="kicker">Knock-out fase</p><h2>Route naar de finale</h2></div></div><div class="bracket"><div class="round"><h3>Ronde van 32</h3><p>28 juni – 3 juli</p></div><div class="round"><h3>Achtste finales</h3><p>4 – 7 juli</p></div><div class="round"><h3>Kwartfinales</h3><p>9 – 11 juli</p></div><div class="round"><h3>Halve finales</h3><p>14 – 15 juli</p></div><div class="round"><h3>Finale</h3><p>19 juli 2026</p></div></div></section>
+</main>
+<footer>Niet-officiële fanwebsite voor WK 2026.</footer>
+<script>
+const DATA = {"teams": [{"id": "mexico", "name": "Mexico", "flag": "🇲🇽", "group": "A", "position": 1}, {"id": "south-africa", "name": "South Africa", "flag": "🇿🇦", "group": "A", "position": 2}, {"id": "korea-republic", "name": "Korea Republic", "flag": "🇰🇷", "group": "A", "position": 3}, {"id": "czechia", "name": "Czechia", "flag": "🇨🇿", "group": "A", "position": 4}, {"id": "canada", "name": "Canada", "flag": "🇨🇦", "group": "B", "position": 1}, {"id": "bosnia-and-herzegovina", "name": "Bosnia and Herzegovina", "flag": "🇧🇦", "group": "B", "position": 2}, {"id": "qatar", "name": "Qatar", "flag": "🇶🇦", "group": "B", "position": 3}, {"id": "switzerland", "name": "Switzerland", "flag": "🇨🇭", "group": "B", "position": 4}, {"id": "brazil", "name": "Brazil", "flag": "🇧🇷", "group": "C", "position": 1}, {"id": "morocco", "name": "Morocco", "flag": "🇲🇦", "group": "C", "position": 2}, {"id": "haiti", "name": "Haiti", "flag": "🇭🇹", "group": "C", "position": 3}, {"id": "scotland", "name": "Scotland", "flag": "🏴", "group": "C", "position": 4}, {"id": "united-states", "name": "United States", "flag": "🇺🇸", "group": "D", "position": 1}, {"id": "paraguay", "name": "Paraguay", "flag": "🇵🇾", "group": "D", "position": 2}, {"id": "australia", "name": "Australia", "flag": "🇦🇺", "group": "D", "position": 3}, {"id": "turkiye", "name": "Türkiye", "flag": "🇹🇷", "group": "D", "position": 4}, {"id": "germany", "name": "Germany", "flag": "🇩🇪", "group": "E", "position": 1}, {"id": "cote-divoire", "name": "Côte d'Ivoire", "flag": "🇨🇮", "group": "E", "position": 2}, {"id": "curacao", "name": "Curaçao", "flag": "🇨🇼", "group": "E", "position": 3}, {"id": "ecuador", "name": "Ecuador", "flag": "🇪🇨", "group": "E", "position": 4}, {"id": "netherlands", "name": "Netherlands", "flag": "🇳🇱", "group": "F", "position": 1}, {"id": "japan", "name": "Japan", "flag": "🇯🇵", "group": "F", "position": 2}, {"id": "sweden", "name": "Sweden", "flag": "🇸🇪", "group": "F", "position": 3}, {"id": "tunisia", "name": "Tunisia", "flag": "🇹🇳", "group": "F", "position": 4}, {"id": "belgium", "name": "Belgium", "flag": "🇧🇪", "group": "G", "position": 1}, {"id": "egypt", "name": "Egypt", "flag": "🇪🇬", "group": "G", "position": 2}, {"id": "ir-iran", "name": "IR Iran", "flag": "🇮🇷", "group": "G", "position": 3}, {"id": "new-zealand", "name": "New Zealand", "flag": "🇳🇿", "group": "G", "position": 4}, {"id": "spain", "name": "Spain", "flag": "🇪🇸", "group": "H", "position": 1}, {"id": "cabo-verde", "name": "Cabo Verde", "flag": "🇨🇻", "group": "H", "position": 2}, {"id": "saudi-arabia", "name": "Saudi Arabia", "flag": "🇸🇦", "group": "H", "position": 3}, {"id": "uruguay", "name": "Uruguay", "flag": "🇺🇾", "group": "H", "position": 4}, {"id": "france", "name": "France", "flag": "🇫🇷", "group": "I", "position": 1}, {"id": "senegal", "name": "Senegal", "flag": "🇸🇳", "group": "I", "position": 2}, {"id": "iraq", "name": "Iraq", "flag": "🇮🇶", "group": "I", "position": 3}, {"id": "norway", "name": "Norway", "flag": "🇳🇴", "group": "I", "position": 4}, {"id": "argentina", "name": "Argentina", "flag": "🇦🇷", "group": "J", "position": 1}, {"id": "algeria", "name": "Algeria", "flag": "🇩🇿", "group": "J", "position": 2}, {"id": "austria", "name": "Austria", "flag": "🇦🇹", "group": "J", "position": 3}, {"id": "jordan", "name": "Jordan", "flag": "🇯🇴", "group": "J", "position": 4}, {"id": "portugal", "name": "Portugal", "flag": "🇵🇹", "group": "K", "position": 1}, {"id": "congo-dr", "name": "Congo DR", "flag": "🇨🇩", "group": "K", "position": 2}, {"id": "uzbekistan", "name": "Uzbekistan", "flag": "🇺🇿", "group": "K", "position": 3}, {"id": "colombia", "name": "Colombia", "flag": "🇨🇴", "group": "K", "position": 4}, {"id": "england", "name": "England", "flag": "🏴", "group": "L", "position": 1}, {"id": "croatia", "name": "Croatia", "flag": "🇭🇷", "group": "L", "position": 2}, {"id": "ghana", "name": "Ghana", "flag": "🇬🇭", "group": "L", "position": 3}, {"id": "panama", "name": "Panama", "flag": "🇵🇦", "group": "L", "position": 4}], "groups": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"], "matches": [{"id": "M001", "group": "A", "date": "2026-06-11", "home": "mexico", "away": "south-africa", "venue": "Mexico City Stadium"}, {"id": "M002", "group": "A", "date": "2026-06-11", "home": "korea-republic", "away": "czechia", "venue": "Guadalajara Stadium"}, {"id": "M003", "group": "B", "date": "2026-06-12", "home": "canada", "away": "bosnia-and-herzegovina", "venue": "Toronto Stadium"}, {"id": "M004", "group": "D", "date": "2026-06-12", "home": "united-states", "away": "paraguay", "venue": "Los Angeles Stadium"}, {"id": "M005", "group": "C", "date": "2026-06-13", "home": "haiti", "away": "scotland", "venue": "Boston Stadium"}, {"id": "M006", "group": "D", "date": "2026-06-13", "home": "australia", "away": "turkiye", "venue": "Vancouver Stadium"}, {"id": "M007", "group": "C", "date": "2026-06-13", "home": "brazil", "away": "morocco", "venue": "New York New Jersey Stadium"}, {"id": "M008", "group": "B", "date": "2026-06-13", "home": "qatar", "away": "switzerland", "venue": "San Francisco Bay Area Stadium"}, {"id": "M009", "group": "E", "date": "2026-06-14", "home": "cote-divoire", "away": "ecuador", "venue": "Philadelphia Stadium"}, {"id": "M010", "group": "E", "date": "2026-06-14", "home": "germany", "away": "curacao", "venue": "Houston Stadium"}, {"id": "M011", "group": "F", "date": "2026-06-14", "home": "netherlands", "away": "japan", "venue": "Dallas Stadium"}, {"id": "M012", "group": "F", "date": "2026-06-14", "home": "sweden", "away": "tunisia", "venue": "Monterrey Stadium"}, {"id": "M013", "group": "H", "date": "2026-06-15", "home": "saudi-arabia", "away": "uruguay", "venue": "Miami Stadium"}, {"id": "M014", "group": "H", "date": "2026-06-15", "home": "spain", "away": "cabo-verde", "venue": "Atlanta Stadium"}, {"id": "M015", "group": "G", "date": "2026-06-15", "home": "ir-iran", "away": "new-zealand", "venue": "Los Angeles Stadium"}, {"id": "M016", "group": "G", "date": "2026-06-15", "home": "belgium", "away": "egypt", "venue": "Seattle Stadium"}, {"id": "M017", "group": "I", "date": "2026-06-16", "home": "france", "away": "senegal", "venue": "New York New Jersey Stadium"}, {"id": "M018", "group": "I", "date": "2026-06-16", "home": "iraq", "away": "norway", "venue": "Boston Stadium"}, {"id": "M019", "group": "J", "date": "2026-06-16", "home": "argentina", "away": "algeria", "venue": "Kansas City Stadium"}, {"id": "M020", "group": "J", "date": "2026-06-16", "home": "austria", "away": "jordan", "venue": "San Francisco Bay Area Stadium"}, {"id": "M021", "group": "L", "date": "2026-06-17", "home": "ghana", "away": "panama", "venue": "Toronto Stadium"}, {"id": "M022", "group": "L", "date": "2026-06-17", "home": "england", "away": "croatia", "venue": "Dallas Stadium"}, {"id": "M023", "group": "K", "date": "2026-06-17", "home": "portugal", "away": "congo-dr", "venue": "Houston Stadium"}, {"id": "M024", "group": "K", "date": "2026-06-17", "home": "uzbekistan", "away": "colombia", "venue": "Mexico City Stadium"}, {"id": "M025", "group": "A", "date": "2026-06-18", "home": "czechia", "away": "south-africa", "venue": "Atlanta Stadium"}, {"id": "M026", "group": "B", "date": "2026-06-18", "home": "switzerland", "away": "bosnia-and-herzegovina", "venue": "Los Angeles Stadium"}, {"id": "M027", "group": "B", "date": "2026-06-18", "home": "canada", "away": "qatar", "venue": "Vancouver Stadium"}, {"id": "M028", "group": "A", "date": "2026-06-18", "home": "mexico", "away": "korea-republic", "venue": "Guadalajara Stadium"}, {"id": "M029", "group": "C", "date": "2026-06-19", "home": "brazil", "away": "haiti", "venue": "Philadelphia Stadium"}, {"id": "M030", "group": "C", "date": "2026-06-19", "home": "scotland", "away": "morocco", "venue": "Boston Stadium"}, {"id": "M031", "group": "D", "date": "2026-06-19", "home": "turkiye", "away": "paraguay", "venue": "San Francisco Bay Area Stadium"}, {"id": "M032", "group": "D", "date": "2026-06-19", "home": "united-states", "away": "australia", "venue": "Seattle Stadium"}, {"id": "M033", "group": "E", "date": "2026-06-20", "home": "germany", "away": "cote-divoire", "venue": "Toronto Stadium"}, {"id": "M034", "group": "E", "date": "2026-06-20", "home": "ecuador", "away": "curacao", "venue": "Kansas City Stadium"}, {"id": "M035", "group": "F", "date": "2026-06-20", "home": "netherlands", "away": "sweden", "venue": "Houston Stadium"}, {"id": "M036", "group": "F", "date": "2026-06-20", "home": "tunisia", "away": "japan", "venue": "Monterrey Stadium"}, {"id": "M037", "group": "H", "date": "2026-06-21", "home": "uruguay", "away": "cabo-verde", "venue": "Miami Stadium"}, {"id": "M038", "group": "H", "date": "2026-06-21", "home": "spain", "away": "saudi-arabia", "venue": "Atlanta Stadium"}, {"id": "M039", "group": "G", "date": "2026-06-21", "home": "belgium", "away": "ir-iran", "venue": "Los Angeles Stadium"}, {"id": "M040", "group": "G", "date": "2026-06-21", "home": "new-zealand", "away": "egypt", "venue": "Vancouver Stadium"}, {"id": "M041", "group": "I", "date": "2026-06-22", "home": "norway", "away": "senegal", "venue": "New York New Jersey Stadium"}, {"id": "M042", "group": "I", "date": "2026-06-22", "home": "france", "away": "iraq", "venue": "Philadelphia Stadium"}, {"id": "M043", "group": "J", "date": "2026-06-22", "home": "argentina", "away": "austria", "venue": "Dallas Stadium"}, {"id": "M044", "group": "J", "date": "2026-06-22", "home": "jordan", "away": "algeria", "venue": "San Francisco Bay Area Stadium"}, {"id": "M045", "group": "L", "date": "2026-06-23", "home": "england", "away": "ghana", "venue": "Boston Stadium"}, {"id": "M046", "group": "L", "date": "2026-06-23", "home": "panama", "away": "croatia", "venue": "Toronto Stadium"}, {"id": "M047", "group": "K", "date": "2026-06-23", "home": "portugal", "away": "uzbekistan", "venue": "Houston Stadium"}, {"id": "M048", "group": "K", "date": "2026-06-23", "home": "colombia", "away": "congo-dr", "venue": "Guadalajara Stadium"}, {"id": "M049", "group": "C", "date": "2026-06-24", "home": "scotland", "away": "brazil", "venue": "Miami Stadium"}, {"id": "M050", "group": "C", "date": "2026-06-24", "home": "morocco", "away": "haiti", "venue": "Atlanta Stadium"}, {"id": "M051", "group": "B", "date": "2026-06-24", "home": "switzerland", "away": "canada", "venue": "Vancouver Stadium"}, {"id": "M052", "group": "B", "date": "2026-06-24", "home": "bosnia-and-herzegovina", "away": "qatar", "venue": "Seattle Stadium"}, {"id": "M053", "group": "A", "date": "2026-06-24", "home": "czechia", "away": "mexico", "venue": "Mexico City Stadium"}, {"id": "M054", "group": "A", "date": "2026-06-24", "home": "south-africa", "away": "korea-republic", "venue": "Monterrey Stadium"}, {"id": "M055", "group": "E", "date": "2026-06-25", "home": "curacao", "away": "cote-divoire", "venue": "Philadelphia Stadium"}, {"id": "M056", "group": "E", "date": "2026-06-25", "home": "ecuador", "away": "germany", "venue": "New York New Jersey Stadium"}, {"id": "M057", "group": "F", "date": "2026-06-25", "home": "japan", "away": "sweden", "venue": "Dallas Stadium"}, {"id": "M058", "group": "F", "date": "2026-06-25", "home": "tunisia", "away": "netherlands", "venue": "Kansas City Stadium"}, {"id": "M059", "group": "D", "date": "2026-06-25", "home": "turkiye", "away": "united-states", "venue": "Los Angeles Stadium"}, {"id": "M060", "group": "D", "date": "2026-06-25", "home": "paraguay", "away": "australia", "venue": "San Francisco Bay Area Stadium"}, {"id": "M061", "group": "I", "date": "2026-06-26", "home": "norway", "away": "france", "venue": "Boston Stadium"}, {"id": "M062", "group": "I", "date": "2026-06-26", "home": "senegal", "away": "iraq", "venue": "Toronto Stadium"}, {"id": "M063", "group": "G", "date": "2026-06-26", "home": "egypt", "away": "ir-iran", "venue": "Seattle Stadium"}, {"id": "M064", "group": "G", "date": "2026-06-26", "home": "new-zealand", "away": "belgium", "venue": "Vancouver Stadium"}, {"id": "M065", "group": "H", "date": "2026-06-26", "home": "cabo-verde", "away": "saudi-arabia", "venue": "Houston Stadium"}, {"id": "M066", "group": "H", "date": "2026-06-26", "home": "uruguay", "away": "spain", "venue": "Guadalajara Stadium"}, {"id": "M067", "group": "L", "date": "2026-06-27", "home": "panama", "away": "england", "venue": "New York New Jersey Stadium"}, {"id": "M068", "group": "L", "date": "2026-06-27", "home": "croatia", "away": "ghana", "venue": "Philadelphia Stadium"}, {"id": "M069", "group": "J", "date": "2026-06-27", "home": "algeria", "away": "austria", "venue": "Kansas City Stadium"}, {"id": "M070", "group": "J", "date": "2026-06-27", "home": "jordan", "away": "argentina", "venue": "Dallas Stadium"}, {"id": "M071", "group": "K", "date": "2026-06-27", "home": "colombia", "away": "portugal", "venue": "Miami Stadium"}, {"id": "M072", "group": "K", "date": "2026-06-27", "home": "congo-dr", "away": "uzbekistan", "venue": "Atlanta Stadium"}]};
+const teams = DATA.teams, groups = DATA.groups, matches = DATA.matches;
+const byId = Object.fromEntries(teams.map(t => [t.id, t]));
+const groupTeams = Object.fromEntries(groups.map(g => [g, teams.filter(t => t.group === g).sort((a,b)=>a.position-b.position)]));
+const fmt = date => new Intl.DateTimeFormat('nl-NL', {weekday:'short', day:'numeric', month:'long', year:'numeric'}).format(new Date(date + 'T12:00:00'));
+function validate() {
+  const errors = [];
+  if (groups.length !== 12) errors.push('Niet precies 12 groepen.');
+  if (teams.length !== 48) errors.push('Niet precies 48 teams.');
+  if (matches.length !== 72) errors.push('Niet precies 72 groepswedstrijden.');
+  groups.forEach(g => {
+    const gt = groupTeams[g] || [];
+    if (gt.length !== 4) errors.push(`Groep ${g} heeft ${gt.length} teams.`);
+    const ids = new Set(gt.map(t => t.id));
+    const gm = matches.filter(m => m.group === g);
+    if (gm.length !== 6) errors.push(`Groep ${g} heeft ${gm.length} wedstrijden.`);
+    const seen = new Set();
+    gm.forEach(m => {
+      if (m.home === m.away) errors.push(`${m.id}: team tegen zichzelf.`);
+      if (!ids.has(m.home) || !ids.has(m.away)) errors.push(`${m.id}: team niet in groep ${g}.`);
+      const pair = [m.home, m.away].sort().join('|');
+      if (seen.has(pair)) errors.push(`${m.id}: dubbele wedstrijd.`);
+      seen.add(pair);
+    });
+  });
+  return errors;
+}
+function renderGroups() {
+  document.querySelector('#groups').innerHTML = groups.map(g => `<article class="card"><h3>Groep ${g}</h3>${groupTeams[g].map(t => `<div class="team-row"><strong>${t.position}. ${t.flag} ${t.name}</strong><span>★</span></div>`).join('')}</article>`).join('');
+  const sel = document.querySelector('#groupFilter');
+  groups.forEach(g => sel.insertAdjacentHTML('beforeend', `<option value="${g}">Groep ${g}</option>`));
+}
+function renderMatches() {
+  const gf = document.querySelector('#groupFilter').value;
+  const q = document.querySelector('#search').value.toLowerCase();
+  const list = matches.filter(m => {
+    const h = byId[m.home], a = byId[m.away];
+    return (gf === 'all' || m.group === gf) && `${h.name} ${a.name} ${m.venue}`.toLowerCase().includes(q);
+  });
+  document.querySelector('#matches').innerHTML = list.map(m => {
+    const h = byId[m.home], a = byId[m.away];
+    return `<article class="match"><div class="meta"><span>Groep ${m.group}</span><span>${fmt(m.date)}</span></div><div class="teams"><div>${h.flag} ${h.name}</div><span class="vs">VS</span><div>${a.flag} ${a.name}</div></div><div class="venue">🏟️ ${m.venue}</div></article>`;
+  }).join('');
+}
+function getPred() { return JSON.parse(localStorage.getItem('wk26_preds_v3') || '{}'); }
+function setPred(p) { localStorage.setItem('wk26_preds_v3', JSON.stringify(p)); }
+function renderPredictions() {
+  const p = getPred();
+  document.querySelector('#predictions').innerHTML = matches.map(m => {
+    const h = byId[m.home], a = byId[m.away], pr = p[m.id] || {};
+    return `<div class="prediction"><strong>${h.flag} ${h.name}</strong><div class="scores"><input type="number" min="0" value="${pr.home ?? ''}" data-id="${m.id}" data-side="home" placeholder="0"><input type="number" min="0" value="${pr.away ?? ''}" data-id="${m.id}" data-side="away" placeholder="0"></div><strong>${a.flag} ${a.name}</strong></div>`;
+  }).join('');
+  document.querySelectorAll('.scores input').forEach(input => input.addEventListener('input', e => {
+    const p = getPred(), id = e.target.dataset.id, side = e.target.dataset.side;
+    p[id] = p[id] || {};
+    p[id][side] = e.target.value === '' ? '' : Number(e.target.value);
+    setPred(p); renderStandings();
+  }));
+}
+function renderStandings() {
+  const p = getPred();
+  document.querySelector('#standings').innerHTML = groups.map(g => {
+    const rows = Object.fromEntries(groupTeams[g].map(t => [t.id, {t,pl:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}]));
+    matches.filter(m => m.group === g).forEach(m => {
+      const s = p[m.id];
+      if (!s || s.home === '' || s.away === '' || s.home === undefined || s.away === undefined) return;
+      const h = rows[m.home], a = rows[m.away];
+      h.pl++; a.pl++; h.gf += s.home; h.ga += s.away; a.gf += s.away; a.ga += s.home; h.gd = h.gf-h.ga; a.gd = a.gf-a.ga;
+      if (s.home > s.away) { h.w++; a.l++; h.pts += 3; }
+      else if (s.home < s.away) { a.w++; h.l++; a.pts += 3; }
+      else { h.d++; a.d++; h.pts++; a.pts++; }
+    });
+    const sorted = Object.values(rows).sort((a,b)=>b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || a.t.name.localeCompare(b.t.name));
+    return `<article class="standing"><h3>Groep ${g}</h3><table><thead><tr><th>Team</th><th>G</th><th>W</th><th>GL</th><th>V</th><th>DS</th><th>PT</th></tr></thead><tbody>${sorted.map(r => `<tr><td>${r.t.flag} ${r.t.name}</td><td>${r.pl}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gd}</td><td><strong>${r.pts}</strong></td></tr>`).join('')}</tbody></table></article>`;
+  }).join('');
+}
+function renderCheck() {
+  const errors = validate();
+  const el = document.querySelector('#check');
+  if (errors.length === 0) { el.textContent = '✅ Datacheck: 48 teams / 72 wedstrijden OK'; el.className = 'badge ok'; }
+  else { el.textContent = `⚠️ ${errors.length} datafouten`; el.className = 'badge bad'; console.warn(errors); }
+}
+function countdown() {
+  const target = new Date('2026-06-11T20:00:00+02:00');
+  const diff = Math.max(0, target - new Date());
+  document.querySelector('#d').textContent = Math.floor(diff / 86400000);
+  document.querySelector('#h').textContent = Math.floor(diff / 3600000) % 24;
+  document.querySelector('#m').textContent = Math.floor(diff / 60000) % 60;
+  document.querySelector('#s').textContent = Math.floor(diff / 1000) % 60;
+}
+document.querySelector('#groupFilter').addEventListener('change', renderMatches);
+document.querySelector('#search').addEventListener('input', renderMatches);
+renderGroups(); renderMatches(); renderPredictions(); renderStandings(); renderCheck(); countdown(); setInterval(countdown, 1000);
+</script>
 </body>
 </html>
