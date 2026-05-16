@@ -1,132 +1,124 @@
 <!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WK 2026 Fan Hub</title>
-  <meta name="description" content="Nederlandstalige WK 2026 fanwebsite met speelschema, voorspellingen, poules, bracket en quiz." />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WK 2026 Premium Fan Hub</title>
+  <meta name="description" content="Professionele WK 2026 fanwebsite met echte groepsdata, speelschema, voorspellingen, standen, bracket en premium voetbaldesign.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="site-header">
-    <nav class="nav">
-      <a class="brand" href="#home">⚽ WK 2026 Fan Hub</a>
-      <button class="nav-toggle" aria-label="Menu openen">☰</button>
-      <div class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#teams">Teams</a>
-        <a href="#speelschema">Speelschema</a>
-        <a href="#voorspellingen">Voorspellingen</a>
-        <a href="#bracket">Bracket</a>
-        <a href="#quiz">Quiz</a>
-      </div>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#home"><span>⚽</span> WK26</a>
+    <button id="menuBtn" class="menu-btn">☰</button>
+    <nav id="nav">
+      <a href="#groepen">Groepen</a>
+      <a href="#schema">Speelschema</a>
+      <a href="#voorspellen">Voorspellen</a>
+      <a href="#bracket">Bracket</a>
+      <a href="#data">Datacheck</a>
     </nav>
   </header>
 
   <main>
-    <section id="home" class="hero section">
-      <div class="stadium-lights"></div>
-      <div class="hero-content">
-        <p class="eyebrow">Verenigde Staten • Canada • Mexico</p>
-        <h1>WK 2026 Fan Hub</h1>
-        <p class="hero-text">Volg de aftrap, bekijk poules, vul je voorspellingen in en beleef het grootste WK ooit met 48 teams.</p>
-        <div class="countdown" aria-label="Aftelklok tot de openingswedstrijd">
-          <div><strong id="days">0</strong><span>dagen</span></div>
-          <div><strong id="hours">0</strong><span>uren</span></div>
-          <div><strong id="minutes">0</strong><span>min</span></div>
-          <div><strong id="seconds">0</strong><span>sec</span></div>
+    <section id="home" class="hero">
+      <div class="floodlight left"></div>
+      <div class="floodlight right"></div>
+      <div class="hero-copy">
+        <p class="kicker">Canada • Mexico • United States</p>
+        <h1>World Cup<br><span>2026</span></h1>
+        <p class="lead">Een premium Nederlandstalige WK-hub met echte groepsdata, wedstrijdschema, voorspellingen en automatische standen.</p>
+        <div class="countdown">
+          <div><b id="cd-days">0</b><small>Dagen</small></div>
+          <div><b id="cd-hours">0</b><small>Uur</small></div>
+          <div><b id="cd-mins">0</b><small>Min</small></div>
+          <div><b id="cd-secs">0</b><small>Sec</small></div>
         </div>
-        <div class="hero-actions">
-          <a class="button primary" href="#speelschema">Bekijk speelschema</a>
-          <a class="button ghost" href="#voorspellingen">Doe voorspellingen</a>
-        </div>
-      </div>
-      <div class="hero-card">
-        <div class="match-ticket">
-          <span class="ticket-label">Wedstrijd van de dag</span>
-          <h3>Aftrap richting 2026</h3>
-          <p>Groepsfase: 11 t/m 27 juni 2026</p>
-          <p>Finale: 19 juli 2026</p>
+        <div class="actions">
+          <a class="btn primary" href="#schema">Bekijk wedstrijden</a>
+          <a class="btn secondary" href="#voorspellen">Start voorspellen</a>
         </div>
       </div>
+      <aside class="glass matchday-card">
+        <p class="kicker">Aftrap</p>
+        <h2>Mexico vs South Africa</h2>
+        <p>11 juni 2026 • Mexico City Stadium</p>
+        <div class="pitch-mini"><span></span></div>
+      </aside>
     </section>
 
-    <section class="section hosts">
-      <h2>Gastlanden</h2>
-      <div class="host-grid">
-        <article>🇺🇸 <strong>Verenigde Staten</strong><span>Stadions, show en grote voetbalstadions.</span></article>
-        <article>🇨🇦 <strong>Canada</strong><span>Noord-Amerikaanse energie en fanbeleving.</span></article>
-        <article>🇲🇽 <strong>Mexico</strong><span>Voetbalcultuur, kleur en WK-historie.</span></article>
+    <section class="stats-bar">
+      <div><b>48</b><span>Teams</span></div>
+      <div><b>12</b><span>Groepen</span></div>
+      <div><b>104</b><span>Wedstrijden</span></div>
+      <div><b>16</b><span>Host cities</span></div>
+    </section>
+
+    <section id="groepen" class="section">
+      <div class="section-head">
+        <p class="kicker">Final Draw</p>
+        <h2>Groepen A t/m L</h2>
       </div>
+      <div id="groupsGrid" class="groups-grid"></div>
     </section>
 
-    <section id="teams" class="section">
-      <div class="section-title">
-        <p class="eyebrow">Groepsfase</p>
-        <h2>Teams & Poules</h2>
-      </div>
-      <div id="groups" class="groups-grid"></div>
-    </section>
-
-    <section id="speelschema" class="section">
-      <div class="section-title row">
+    <section id="schema" class="section">
+      <div class="section-head split">
         <div>
-          <p class="eyebrow">Aftrap</p>
+          <p class="kicker">Officiële groepsfase-data</p>
           <h2>Speelschema</h2>
         </div>
-        <div id="data-check" class="data-check">Datacheck</div>
+        <div id="checkBadge" class="check-badge">Datacheck</div>
       </div>
-      <p class="notice">Schema gebaseerd op WK 2026-indeling/mockdata; eenvoudig aanpasbaar zodra officiële wijzigingen nodig zijn.</p>
-      <div class="filters">
-        <select id="group-filter" aria-label="Filter op groep">
-          <option value="all">Alle groepen</option>
-        </select>
+      <div class="toolbar">
+        <select id="groupFilter"><option value="all">Alle groepen</option></select>
+        <input id="searchInput" type="search" placeholder="Zoek team of stadion...">
       </div>
-      <div id="matches" class="matches-grid"></div>
+      <div id="matchesGrid" class="matches-grid"></div>
     </section>
 
-    <section id="voorspellingen" class="section">
-      <div class="section-title">
-        <p class="eyebrow">Jouw voorspelling</p>
-        <h2>Voorspellingen & standen</h2>
+    <section id="voorspellen" class="section">
+      <div class="section-head">
+        <p class="kicker">Jouw voorspelling</p>
+        <h2>Scores invullen & standen berekenen</h2>
       </div>
-      <p class="notice">Vul scores in. De groepsstanden worden automatisch berekend op punten, doelsaldo en goals voor.</p>
-      <div id="prediction-list" class="prediction-list"></div>
-      <div id="standings" class="standings-grid"></div>
+      <p class="info">Scores worden lokaal in je browser opgeslagen. De stand sorteert op punten, doelsaldo en goals voor.</p>
+      <div id="predictionGrid" class="prediction-grid"></div>
+      <div id="standingsGrid" class="standings-grid"></div>
     </section>
 
     <section id="bracket" class="section">
-      <div class="section-title">
-        <p class="eyebrow">Knock-out</p>
-        <h2>Bracket vanaf ronde van 32</h2>
+      <div class="section-head">
+        <p class="kicker">Knock-out</p>
+        <h2>Route naar de finale</h2>
       </div>
       <div class="bracket">
-        <div class="round"><h3>Ronde van 32</h3><p>1A vs 3C/D/E</p><p>1B vs 3F/G/H</p><p>1C vs 2D</p><p>1D vs 2C</p></div>
-        <div class="round"><h3>Achtste finales</h3><p>Winnaar R32-1</p><p>Winnaar R32-2</p><p>Winnaar R32-3</p></div>
-        <div class="round"><h3>Kwartfinales</h3><p>Laatste 8</p><p>Alles of niets</p></div>
-        <div class="round"><h3>Halve finales</h3><p>Stadionlichten aan</p><p>Finaleplek op het spel</p></div>
-        <div class="round final"><h3>Finale</h3><p>19 juli 2026</p><p>Wereldkampioen</p></div>
+        <div class="round"><h3>Ronde van 32</h3><p>28 juni – 3 juli</p><span>Groepswinnaars, nummers 2 en beste nummers 3</span></div>
+        <div class="round"><h3>Achtste finales</h3><p>4 – 7 juli</p><span>Laatste 16</span></div>
+        <div class="round"><h3>Kwartfinales</h3><p>9 – 11 juli</p><span>Laatste 8</span></div>
+        <div class="round"><h3>Halve finales</h3><p>14 – 15 juli</p><span>Alles of niets</span></div>
+        <div class="round final"><h3>Finale</h3><p>19 juli</p><span>Wereldkampioen 2026</span></div>
       </div>
     </section>
 
-    <section id="quiz" class="section">
-      <div class="section-title">
-        <p class="eyebrow">Supportersquiz</p>
-        <h2>WK Trivia</h2>
+    <section id="data" class="section">
+      <div class="section-head">
+        <p class="kicker">Kwaliteitscontrole</p>
+        <h2>Datacheck</h2>
       </div>
-      <div class="quiz-card">
-        <p id="quiz-question"></p>
-        <div id="quiz-options"></div>
-        <p id="quiz-result"></p>
-        <button id="next-question" class="button primary">Volgende vraag</button>
-      </div>
+      <div id="dataPanel" class="glass data-panel"></div>
     </section>
   </main>
 
-  <footer class="footer">
-    <p>Gemaakt voor fans. Geen officiële FIFA-site.</p>
+  <footer>
+    <p>Niet-officiële fanwebsite. Data gebaseerd op gepubliceerde WK 2026-groepsfase-informatie; controleer officiële bronnen voor last-minute wijzigingen.</p>
   </footer>
 
+  <script src="data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

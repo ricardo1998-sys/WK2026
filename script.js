@@ -1,231 +1,89 @@
-const flags = ["🇺🇸","🇨🇦","🇲🇽","🇧🇷","🇦🇷","🇫🇷","🇳🇱","🇩🇪","🇪🇸","🇬🇧","🇵🇹","🇮🇹","🇯🇵","🇰🇷","🇲🇦","🇸🇳","🇺🇾","🇨🇴","🇨🇭","🇭🇷","🇧🇪","🇩🇰","🇸🇪","🇳🇴","🇵🇱","🇷🇸","🇹🇷","🇺🇦","🇦🇺","🇮🇷","🇸🇦","🇪🇬","🇹🇳","🇬🇭","🇨🇲","🇳🇬","🇨🇱","🇵🇾","🇵🇪","🇪🇨","🇨🇷","🇯🇲","🇵🇦","🇶🇦","🇦🇪","🇿🇦","🇨🇳","🇺🇿"];
-const names = [
-  "Verenigde Staten","Canada","Mexico","Brazilië","Argentinië","Frankrijk","Nederland","Duitsland",
-  "Spanje","Engeland","Portugal","Italië","Japan","Zuid-Korea","Marokko","Senegal",
-  "Uruguay","Colombia","Zwitserland","Kroatië","België","Denemarken","Zweden","Noorwegen",
-  "Polen","Servië","Turkije","Oekraïne","Australië","Iran","Saoedi-Arabië","Egypte",
-  "Tunesië","Ghana","Kameroen","Nigeria","Chili","Paraguay","Peru","Ecuador",
-  "Costa Rica","Jamaica","Panama","Qatar","VAE","Zuid-Afrika","China","Oezbekistan"
-];
+const {teams, groups, matches} = window.WK_DATA;
+const byId = Object.fromEntries(teams.map(t=>[t.id,t]));
+const groupMap = Object.fromEntries(groups.map(g=>[g, teams.filter(t=>t.group===g).sort((a,b)=>a.position-b.position)]));
 
-const teams = names.map((name, i) => ({
-  id: `T${i+1}`,
-  name,
-  flag: flags[i],
-  coach: "Nog te bepalen",
-  stars: "Sterspelers volgen",
-  ranking: "FIFA-ranking volgt"
-}));
-
-const groups = Array.from({length:12}, (_, gi) => ({
-  id: String.fromCharCode(65 + gi),
-  teams: teams.slice(gi*4, gi*4 + 4)
-}));
-
-const stadiums = ["Azteca Stadion","BMO Field","MetLife Stadium","AT&T Stadium","BC Place","SoFi Stadium","Hard Rock Stadium","Mercedes-Benz Stadium","NRG Stadium","Lumen Field","Levi's Stadium","Lincoln Financial Field"];
-const pairings = [[0,1],[2,3],[0,2],[3,1],[3,0],[1,2]];
-const matches = [];
-let matchNo = 1;
-const start = new Date("2026-06-11T20:00:00");
-groups.forEach((group, gi) => {
-  pairings.forEach((pair, pi) => {
-    const d = new Date(start.getTime() + (matchNo-1) * 8 * 60 * 60 * 1000);
-    matches.push({
-      id: `M${matchNo}`,
-      group: group.id,
-      matchday: Math.floor(pi / 2) + 1,
-      home: group.teams[pair[0]].id,
-      away: group.teams[pair[1]].id,
-      date: d.toISOString(),
-      stadium: stadiums[(matchNo-1) % stadiums.length]
-    });
-    matchNo++;
-  });
-});
-
-const teamById = Object.fromEntries(teams.map(t => [t.id, t]));
-
-function validateData() {
-  const errors = [];
-  if (groups.length !== 12) errors.push("Er zijn niet precies 12 groepen.");
-  groups.forEach(g => {
-    if (g.teams.length !== 4) errors.push(`Groep ${g.id} heeft niet precies 4 teams.`);
-    const groupTeamIds = new Set(g.teams.map(t => t.id));
-    const groupMatches = matches.filter(m => m.group === g.id);
-    if (groupMatches.length !== 6) errors.push(`Groep ${g.id} heeft niet precies 6 wedstrijden.`);
-    const seen = new Set();
-    groupMatches.forEach(m => {
-      if (m.home === m.away) errors.push(`${m.id}: team speelt tegen zichzelf.`);
-      if (!groupTeamIds.has(m.home) || !groupTeamIds.has(m.away)) errors.push(`${m.id}: team buiten groep ${g.id}.`);
-      const key = [m.home, m.away].sort().join("-");
-      if (seen.has(key)) errors.push(`${m.id}: dubbele wedstrijd in groep ${g.id}.`);
-      seen.add(key);
+const fmt = d => new Intl.DateTimeFormat('nl-NL',{weekday:'short', day:'numeric', month:'long', year:'numeric'}).format(new Date(d+'T12:00:00'));
+function validate(){
+  const errors=[];
+  if(groups.length!==12) errors.push('Niet precies 12 groepen.');
+  if(matches.length!==72) errors.push('Niet precies 72 groepswedstrijden.');
+  groups.forEach(g=>{
+    const gt=groupMap[g]||[];
+    if(gt.length!==4) errors.push(`Groep ${g}: ${gt.length} teams i.p.v. 4.`);
+    const ids=new Set(gt.map(t=>t.id));
+    const gm=matches.filter(m=>m.group===g);
+    if(gm.length!==6) errors.push(`Groep ${g}: ${gm.length} wedstrijden i.p.v. 6.`);
+    const pairs=new Set();
+    gm.forEach(m=>{
+      if(m.home===m.away) errors.push(`${m.id}: team speelt tegen zichzelf.`);
+      if(!ids.has(m.home)||!ids.has(m.away)) errors.push(`${m.id}: team hoort niet in groep ${g}.`);
+      const key=[m.home,m.away].sort().join('|');
+      if(pairs.has(key)) errors.push(`${m.id}: dubbele wedstrijd in groep ${g}.`);
+      pairs.add(key);
     });
   });
-  if (matches.length !== 72) errors.push("Er zijn niet precies 72 groepswedstrijden.");
   return errors;
 }
-
-function renderGroups() {
-  const el = document.querySelector("#groups");
-  el.innerHTML = groups.map(g => `
-    <article class="group-card">
-      <h3>Groep ${g.id}</h3>
-      ${g.teams.map(t => `
-        <div class="team-row">
-          <span class="team-name">${t.flag} ${t.name}</span>
-          <span class="team-meta">Favoriet team ☆</span>
-        </div>`).join("")}
-    </article>`).join("");
+function renderGroups(){
+  document.querySelector('#groupsGrid').innerHTML = groups.map(g=>`<article class="group-card"><h3>Groep ${g}</h3>${groupMap[g].map(t=>`<div class="team-row"><b><span class="pos">${t.position}</span> ${t.flag} ${t.name}</b><span>★</span></div>`).join('')}</article>`).join('');
+  const sel=document.querySelector('#groupFilter');
+  groups.forEach(g=>sel.insertAdjacentHTML('beforeend',`<option value="${g}">Groep ${g}</option>`));
 }
-
-function renderGroupFilter() {
-  const sel = document.querySelector("#group-filter");
-  groups.forEach(g => {
-    const opt = document.createElement("option");
-    opt.value = g.id;
-    opt.textContent = `Groep ${g.id}`;
-    sel.appendChild(opt);
+function renderMatches(){
+  const gf=document.querySelector('#groupFilter').value;
+  const q=document.querySelector('#searchInput').value.toLowerCase();
+  const filtered=matches.filter(m=>{
+    const h=byId[m.home], a=byId[m.away];
+    return (gf==='all'||m.group===gf) && `${h.name} ${a.name} ${m.venue}`.toLowerCase().includes(q);
   });
-  sel.addEventListener("change", renderMatches);
-}
-
-function formatDate(iso) {
-  return new Intl.DateTimeFormat("nl-NL", { dateStyle:"medium", timeStyle:"short" }).format(new Date(iso));
-}
-
-function renderMatches() {
-  const filter = document.querySelector("#group-filter").value;
-  const list = filter === "all" ? matches : matches.filter(m => m.group === filter);
-  document.querySelector("#matches").innerHTML = list.map(m => {
-    const home = teamById[m.home], away = teamById[m.away];
+  document.querySelector('#matchesGrid').innerHTML = filtered.map(m=>{
+    const h=byId[m.home], a=byId[m.away];
     return `<article class="match-card">
-      <div class="match-meta"><span>Groep ${m.group} • MD${m.matchday}</span><span>${formatDate(m.date)}</span></div>
-      <div class="match-teams">
-        <span class="match-team">${home.flag} ${home.name}</span>
-        <span class="vs">VS</span>
-        <span class="match-team">${away.flag} ${away.name}</span>
-      </div>
-      <div class="stadium">🏟️ ${m.stadium}</div>
+      <div class="match-top"><span>Groep ${m.group}</span><span>${fmt(m.date)}</span></div>
+      <div class="matchup"><div class="team">${h.flag} ${h.name}</div><div class="vs">VS</div><div class="team">${a.flag} ${a.name}</div></div>
+      <div class="venue">🏟️ ${m.venue}</div>
     </article>`;
-  }).join("");
+  }).join('');
 }
-
-function predictions() {
-  return JSON.parse(localStorage.getItem("wk2026_predictions") || "{}");
+function getPred(){return JSON.parse(localStorage.getItem('wk26-premium-predictions')||'{}')}
+function setPred(p){localStorage.setItem('wk26-premium-predictions',JSON.stringify(p))}
+function renderPredictions(){
+  const p=getPred();
+  document.querySelector('#predictionGrid').innerHTML = matches.map(m=>{
+    const h=byId[m.home], a=byId[m.away], pred=p[m.id]||{};
+    return `<div class="prediction-card"><b>${h.flag} ${h.name}</b><div class="score-box"><input type="number" min="0" data-id="${m.id}" data-side="home" value="${pred.home??''}" placeholder="0"><input type="number" min="0" data-id="${m.id}" data-side="away" value="${pred.away??''}" placeholder="0"></div><b>${a.flag} ${a.name}</b></div>`;
+  }).join('');
+  document.querySelectorAll('.prediction-card input').forEach(i=>i.addEventListener('input',e=>{
+    const p=getPred(), id=e.target.dataset.id, side=e.target.dataset.side;
+    p[id]=p[id]||{}; p[id][side]=e.target.value===''?'':Number(e.target.value); setPred(p); renderStandings();
+  }));
 }
-function savePredictions(p) {
-  localStorage.setItem("wk2026_predictions", JSON.stringify(p));
-}
-
-function renderPredictions() {
-  const p = predictions();
-  document.querySelector("#prediction-list").innerHTML = matches.map(m => {
-    const home = teamById[m.home], away = teamById[m.away];
-    const pred = p[m.id] || {};
-    return `<div class="prediction-card">
-      <strong>${home.flag} ${home.name}</strong>
-      <div class="score-inputs">
-        <input type="number" min="0" data-match="${m.id}" data-side="home" value="${pred.home ?? ""}" placeholder="0">
-        <input type="number" min="0" data-match="${m.id}" data-side="away" value="${pred.away ?? ""}" placeholder="0">
-      </div>
-      <strong>${away.flag} ${away.name}</strong>
-    </div>`;
-  }).join("");
-  document.querySelectorAll("#prediction-list input").forEach(input => {
-    input.addEventListener("input", e => {
-      const all = predictions();
-      const id = e.target.dataset.match;
-      all[id] = all[id] || {};
-      const value = e.target.value === "" ? "" : Number(e.target.value);
-      all[id][e.target.dataset.side] = value;
-      savePredictions(all);
-      renderStandings();
+function renderStandings(){
+  const p=getPred();
+  document.querySelector('#standingsGrid').innerHTML = groups.map(g=>{
+    const rows=Object.fromEntries(groupMap[g].map(t=>[t.id,{t,pl:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}]));
+    matches.filter(m=>m.group===g).forEach(m=>{
+      const s=p[m.id]; if(!s||s.home===''||s.away===''||s.home===undefined||s.away===undefined)return;
+      const h=rows[m.home], a=rows[m.away]; h.pl++; a.pl++; h.gf+=s.home; h.ga+=s.away; a.gf+=s.away; a.ga+=s.home; h.gd=h.gf-h.ga; a.gd=a.gf-a.ga;
+      if(s.home>s.away){h.w++;a.l++;h.pts+=3}else if(s.home<s.away){a.w++;h.l++;a.pts+=3}else{h.d++;a.d++;h.pts++;a.pts++}
     });
-  });
-  renderStandings();
+    const sorted=Object.values(rows).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.t.name.localeCompare(b.t.name));
+    return `<article class="standing-card"><h3>Groep ${g}</h3><table><thead><tr><th>Team</th><th>G</th><th>W</th><th>GL</th><th>V</th><th>DV</th><th>DT</th><th>DS</th><th>PT</th></tr></thead><tbody>${sorted.map(r=>`<tr><td>${r.t.flag} ${r.t.name}</td><td>${r.pl}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf}</td><td>${r.ga}</td><td>${r.gd}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></article>`;
+  }).join('');
 }
-
-function renderStandings() {
-  const p = predictions();
-  const html = groups.map(g => {
-    const rows = Object.fromEntries(g.teams.map(t => [t.id, {team:t, played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}]));
-    matches.filter(m => m.group === g.id).forEach(m => {
-      const pred = p[m.id];
-      if (!pred || pred.home === "" || pred.away === "" || pred.home === undefined || pred.away === undefined) return;
-      const h = rows[m.home], a = rows[m.away];
-      h.played++; a.played++;
-      h.gf += pred.home; h.ga += pred.away;
-      a.gf += pred.away; a.ga += pred.home;
-      h.gd = h.gf - h.ga; a.gd = a.gf - a.ga;
-      if (pred.home > pred.away) { h.w++; a.l++; h.pts += 3; }
-      else if (pred.home < pred.away) { a.w++; h.l++; a.pts += 3; }
-      else { h.d++; a.d++; h.pts++; a.pts++; }
-    });
-    const sorted = Object.values(rows).sort((a,b) => b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || a.team.name.localeCompare(b.team.name));
-    return `<article class="standing-card">
-      <h3>Stand groep ${g.id}</h3>
-      <table><thead><tr><th>Team</th><th>G</th><th>W</th><th>GL</th><th>V</th><th>DS</th><th>PT</th></tr></thead>
-      <tbody>${sorted.map(r => `<tr><td>${r.team.flag} ${r.team.name}</td><td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gd}</td><td>${r.pts}</td></tr>`).join("")}</tbody></table>
-    </article>`;
-  }).join("");
-  document.querySelector("#standings").innerHTML = html;
+function renderCheck(){
+  const errors=validate(), badge=document.querySelector('#checkBadge'), panel=document.querySelector('#dataPanel');
+  if(errors.length===0){badge.textContent='✅ Datacheck: schema klopt'; badge.className='check-badge ok'; panel.innerHTML='<h3>✅ Alles logisch gekoppeld</h3><p>12 groepen, 48 teams en 72 groepswedstrijden zijn gecontroleerd. Geen dubbele wedstrijden, geen teams tegen zichzelf en geen teams buiten hun eigen groep.</p>'}
+  else{badge.textContent=`⚠️ ${errors.length} problemen`; badge.className='check-badge bad'; panel.innerHTML='<h3>Problemen gevonden</h3><ul>'+errors.map(e=>`<li>${e}</li>`).join('')+'</ul>'}
 }
-
-function renderDataCheck() {
-  const errors = validateData();
-  const el = document.querySelector("#data-check");
-  if (errors.length === 0) {
-    el.textContent = "✅ Datacheck: 72 wedstrijden kloppen";
-    el.className = "data-check ok";
-  } else {
-    el.textContent = `⚠️ Datacheck: ${errors.length} probleem(en)`;
-    el.className = "data-check bad";
-    console.warn("WK 2026 datacheck:", errors);
-  }
+function countdown(){
+  const target=new Date('2026-06-11T20:00:00+02:00'), diff=Math.max(0,target-new Date());
+  document.querySelector('#cd-days').textContent=Math.floor(diff/86400000);
+  document.querySelector('#cd-hours').textContent=Math.floor(diff/3600000)%24;
+  document.querySelector('#cd-mins').textContent=Math.floor(diff/60000)%60;
+  document.querySelector('#cd-secs').textContent=Math.floor(diff/1000)%60;
 }
-
-const quiz = [
-  {q:"Hoeveel teams doen mee aan het WK 2026?", a:["32","40","48","64"], correct:2},
-  {q:"Welke landen organiseren het WK 2026?", a:["VS, Canada en Mexico","VS en Mexico","Canada en Brazilië","Mexico en Argentinië"], correct:0},
-  {q:"Wanneer is de finale gepland?", a:["11 juni 2026","27 juni 2026","28 juni 2026","19 juli 2026"], correct:3}
-];
-let quizIndex = 0;
-function renderQuiz() {
-  const item = quiz[quizIndex];
-  document.querySelector("#quiz-question").textContent = item.q;
-  document.querySelector("#quiz-result").textContent = "";
-  document.querySelector("#quiz-options").innerHTML = item.a.map((x,i) => `<button class="button ghost option" data-i="${i}">${x}</button>`).join("");
-  document.querySelectorAll(".option").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelector("#quiz-result").textContent = Number(btn.dataset.i) === item.correct ? "✅ Goed!" : "❌ Net niet.";
-    });
-  });
-}
-document.querySelector("#next-question").addEventListener("click", () => {
-  quizIndex = (quizIndex + 1) % quiz.length;
-  renderQuiz();
-});
-
-function countdown() {
-  const target = new Date("2026-06-11T20:00:00+02:00");
-  const diff = Math.max(0, target - new Date());
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor(diff / 3600000) % 24;
-  const minutes = Math.floor(diff / 60000) % 60;
-  const seconds = Math.floor(diff / 1000) % 60;
-  document.querySelector("#days").textContent = days;
-  document.querySelector("#hours").textContent = hours;
-  document.querySelector("#minutes").textContent = minutes;
-  document.querySelector("#seconds").textContent = seconds;
-}
-
-document.querySelector(".nav-toggle").addEventListener("click", () => document.querySelector(".nav-links").classList.toggle("open"));
-renderGroups();
-renderGroupFilter();
-renderMatches();
-renderPredictions();
-renderDataCheck();
-renderQuiz();
-countdown();
-setInterval(countdown, 1000);
+document.querySelector('#menuBtn').onclick=()=>document.querySelector('#nav').classList.toggle('open');
+document.querySelector('#groupFilter').addEventListener('change', renderMatches);
+document.querySelector('#searchInput').addEventListener('input', renderMatches);
+renderGroups(); renderMatches(); renderPredictions(); renderStandings(); renderCheck(); countdown(); setInterval(countdown,1000);
