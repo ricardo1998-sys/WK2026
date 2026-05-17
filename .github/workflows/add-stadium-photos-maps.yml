@@ -1,0 +1,72 @@
+name: Add stadium photos and embedded maps
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch stadium modal
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+
+          css = ".stadium-photo-wrap{margin:12px 0 18px;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(255,255,255,.05)}.stadium-photo{width:100%;height:280px;object-fit:cover;display:block}.map-frame{width:100%;height:310px;border:0;border-radius:18px;background:#06100b}.map-caption{color:var(--muted);font-size:.9rem;margin-top:8px}"
+          if '.stadium-photo-wrap' not in html:
+              html = html.replace('</style>', css + '</style>')
+
+          helper = """
+function loadStadiumPhoto(s){
+  const img=document.querySelector('#stadiumPhoto');
+  const fallback=document.querySelector('#stadiumPhotoFallback');
+  if(!img)return;
+  img.onerror=()=>{img.style.display='none'; if(fallback) fallback.style.display='block'};
+  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(s[1]))
+    .then(r=>r.ok?r.json():null)
+    .then(data=>{
+      const src=data&&data.thumbnail&&data.thumbnail.source;
+      if(src){img.src=src.replace(/\/\d+px-/,'/900px-')} else {img.onerror()}
+    })
+    .catch(()=>img.onerror());
+}
+"""
+          if 'function loadStadiumPhoto' not in html:
+              html = html.replace('function openStadiumModal(key){', helper + '\nfunction openStadiumModal(key){')
+
+          pattern = r"function openStadiumModal\(key\)\{.*?\}\nfunction closeStadiumModal"
+          replacement = r"""function openStadiumModal(key){
+  let s=stadiums.find(x=>x[0]===key);if(!s)return;
+  let sm=matches.filter(m=>m.venue===key);
+  stadiumModalContent.innerHTML=`<p class="kicker">WK stadion</p><h2>${s[1]}</h2><div class="stadium-photo-wrap"><img id="stadiumPhoto" class="stadium-photo" alt="Foto van ${s[1]}" loading="lazy"><p id="stadiumPhotoFallback" class="venue" style="display:none;padding:16px">Foto kon niet automatisch geladen worden.</p></div><p class="lead">${s[5]}</p><div class="modal-grid"><div class="modal-panel"><h3>Stadiongegevens</h3><div class="modal-meta"><div><b>WK naam</b><br>${s[0]}</div><div><b>Stad</b><br>${s[2]}</div><div><b>Capaciteit</b><br>${s[3]}</div><div><b>Normale bespeler/gebruiker</b><br>${s[4]}</div></div><h3 style="margin-top:18px">Locatie</h3><iframe class="map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(s[6])}&output=embed"></iframe><p class="map-caption">Kaart met pin van ${s[1]}.</p></div><div class="modal-panel"><h3>WK-wedstrijden hier</h3>${sm.map(m=>`<div class="team-row"><strong>${fmt(m.date)}</strong><span>${byId[m.home].flag} ${byId[m.home].name} vs ${byId[m.away].flag} ${byId[m.away].name}</span></div>`).join('')}</div></div>`;
+  loadStadiumPhoto(s);
+  stadiumModal.classList.add('open');stadiumModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-lock')
+}
+function closeStadiumModal"""
+          new_html, count = re.subn(pattern, replacement, html, count=1, flags=re.S)
+          if count == 0:
+              print('Could not find openStadiumModal function; no changes made.')
+          else:
+              p.write_text(new_html, encoding='utf-8')
+              print('Patched stadium modal with photo and embedded map.')
+          PY
+      - name: Commit patch
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Add stadium photos and embedded maps"
+            git push
+          fi
