@@ -1,0 +1,41 @@
+name: Fix stadium modal close
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index modal close handler
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+          old = "document.querySelector('#stadiumModalClose').addEventListener('click', closeStadiumModal); document.querySelector('#stadiumModal').addEventListener('click', e => { if (e.target.id === 'stadiumModal') closeStadiumModal(); }); document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStadiumModal(); });"
+          new = "window.addEventListener('DOMContentLoaded', () => { document.querySelector('#stadiumModalClose')?.addEventListener('click', closeStadiumModal); document.querySelector('#stadiumModal')?.addEventListener('click', e => { if (e.target.id === 'stadiumModal') closeStadiumModal(); }); document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStadiumModal(); }); });"
+          if old not in html:
+              print('Expected modal close handler not found; no change made.')
+          else:
+              html = html.replace(old, new)
+              p.write_text(html, encoding='utf-8')
+              print('Patched modal close handler.')
+          PY
+      - name: Commit patch
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Fix stadium modal close button"
+            git push
+          fi
