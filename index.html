@@ -391,7 +391,7 @@ function handleRoute() {
 }
 document.querySelector('#groupFilter').addEventListener('change', renderMatches);
 document.querySelector('#search').addEventListener('input', renderMatches);
-renderGroups(); renderMatches(); renderPredictions(); renderStandings(); renderCheck(); renderStadiumList(); handleRoute(); countdown(); setInterval(countdown, 1000); window.addEventListener('hashchange', handleRoute); document.querySelector('#stadiumModalClose').addEventListener('click', closeStadiumModal); document.querySelector('#stadiumModal').addEventListener('click', e => { if (e.target.id === 'stadiumModal') closeStadiumModal(); }); document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStadiumModal(); });
+renderGroups(); renderMatches(); renderPredictions(); renderStandings(); renderCheck(); renderStadiumList(); handleRoute(); countdown(); setInterval(countdown, 1000); window.addEventListener('hashchange', handleRoute); window.addEventListener('DOMContentLoaded', () => { document.querySelector('#stadiumModalClose')?.addEventListener('click', closeStadiumModal); document.querySelector('#stadiumModal')?.addEventListener('click', e => { if (e.target.id === 'stadiumModal') closeStadiumModal(); }); document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStadiumModal(); }); });
 </script>
 <div id="stadiumModal" class="modal-backdrop" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stadiumModalTitle">
