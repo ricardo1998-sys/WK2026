@@ -1,0 +1,55 @@
+name: Force stadium media patch
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch index directly
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          html = p.read_text(encoding='utf-8')
+
+          css = """\n.stadium-photo-wrap{margin:12px 0 18px;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(255,255,255,.05)}\n.stadium-photo{width:100%;height:280px;object-fit:cover;display:block}\n.map-frame{width:100%;height:310px;border:0;border-radius:18px;background:#06100b;margin-top:14px}\n.map-caption{color:var(--muted);font-size:.9rem;margin-top:8px}\n"""
+          if 'stadium-photo-wrap' not in html:
+              html = html.replace('</style>', css + '</style>', 1)
+
+          helper = """\nfunction loadStadiumPhoto(s){\n  const img=document.querySelector('#stadiumPhoto');\n  const fallback=document.querySelector('#stadiumPhotoFallback');\n  if(!img)return;\n  img.onerror=()=>{img.style.display='none'; if(fallback) fallback.style.display='block'};\n  fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(s.real))\n    .then(r=>r.ok?r.json():null)\n    .then(data=>{\n      const src=data&&data.thumbnail&&data.thumbnail.source;\n      if(src){img.src=src.replace(/\\/\\d+px-/,'/900px-')} else {img.onerror()}\n    })\n    .catch(()=>img.onerror());\n}\n"""
+          if 'function loadStadiumPhoto' not in html:
+              html = html.replace('function openStadiumModal(stadiumKey) {', helper + '\nfunction openStadiumModal(stadiumKey) {', 1)
+
+          old_title = '<h2 id="stadiumModalTitle">${s.real}</h2>\n    <p class="lead">${s.info}</p>'
+          new_title = '<h2 id="stadiumModalTitle">${s.real}</h2>\n    <div class="stadium-photo-wrap"><img id="stadiumPhoto" class="stadium-photo" alt="Foto van ${s.real}" loading="lazy"><p id="stadiumPhotoFallback" class="venue" style="display:none;padding:16px">Foto kon niet automatisch geladen worden.</p></div>\n    <p class="lead">${s.info}</p>'
+          html = html.replace(old_title, new_title, 1)
+
+          old_link = '<a class="map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.query)}" target="_blank" rel="noopener">Open in Google Maps</a>'
+          new_map = '<h3 style="margin-top:18px">Locatie</h3><iframe class="map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=${encodeURIComponent(s.query)}&output=embed"></iframe><p class="map-caption">Kaart met pin van ${s.real}.</p>'
+          html = html.replace(old_link, new_map, 1)
+
+          if 'loadStadiumPhoto(s);' not in html:
+              html = html.replace("  const modal = document.querySelector('#stadiumModal');", "  loadStadiumPhoto(s);\n  const modal = document.querySelector('#stadiumModal');", 1)
+
+          p.write_text(html, encoding='utf-8')
+          print('Patch applied to index.html')
+          PY
+      - name: Commit patch
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Force add stadium photo and embedded map"
+            git push
+          fi
