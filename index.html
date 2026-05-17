@@ -96,6 +96,18 @@ footer{text-align:center;color:var(--muted);padding:36px 18px;border-top:1px sol
 .back-link{display:inline-flex;margin-bottom:18px;color:var(--gold);text-decoration:none;font-weight:1000}
 @media(max-width:850px){.detail-hero,.player-grid,.stadium-grid,.stadium-list,.detail-list{grid-template-columns:1fr}}
 
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
+.modal-backdrop.open{display:flex}
+.modal{width:min(980px,100%);max-height:88vh;overflow:auto;background:linear-gradient(180deg,#10251a,#07120d);border:1px solid var(--line);border-radius:28px;box-shadow:0 30px 120px rgba(0,0,0,.65);padding:22px;position:relative}
+.modal-close{position:sticky;top:0;float:right;background:rgba(255,255,255,.10);border:1px solid var(--line);color:var(--text);border-radius:999px;width:42px;height:42px;font-size:1.4rem;cursor:pointer}
+.modal h2{margin-top:8px}
+.modal-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:14px}
+.modal-panel{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:20px;padding:16px}
+.modal-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}
+.modal-meta div{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:12px}
+body.modal-lock{overflow:hidden}
+@media(max-width:850px){.modal-grid,.modal-meta{grid-template-columns:1fr}.modal{max-height:92vh}}
+.stadium-open{cursor:pointer;border:0;font:inherit}.venue .stadium-open{background:transparent;padding:0}.map-link.stadium-open{border:0}
 </style>
 </head>
 <body>
@@ -185,8 +197,9 @@ function renderMatches() {
   });
   document.querySelector('#matches').innerHTML = list.map(m => {
     const h = byId[m.home], a = byId[m.away];
-    return `<article class="match"><div class="meta"><span>Groep ${m.group}</span><span>${fmt(m.date)}</span></div><div class="teams"><div>${h.flag} ${h.name}</div><span class="vs">VS</span><div>${a.flag} ${a.name}</div></div><div class="venue">🏟️ <a class="stadium-link" href="#stadion-${encodeURIComponent(m.venue)}">${m.venue}</a></div></article>`;
+    return `<article class="match"><div class="meta"><span>Groep ${m.group}</span><span>${fmt(m.date)}</span></div><div class="teams"><div>${h.flag} ${h.name}</div><span class="vs">VS</span><div>${a.flag} ${a.name}</div></div><div class="venue">🏟️ <button class="stadium-link stadium-open" type="button" data-stadium="${m.venue}">${m.venue}</button></div></article>`;
   }).join('');
+  bindStadiumButtons();
 }
 function getPred() { return JSON.parse(localStorage.getItem('wk26_preds_v3') || '{}'); }
 function setPred(p) { localStorage.setItem('wk26_preds_v3', JSON.stringify(p)); }
@@ -234,7 +247,6 @@ function countdown() {
   document.querySelector('#m').textContent = Math.floor(diff / 60000) % 60;
   document.querySelector('#s').textContent = Math.floor(diff / 1000) % 60;
 }
-
 function matchesForTeam(teamId) {
   return matches.filter(m => m.home === teamId || m.away === teamId);
 }
@@ -267,7 +279,7 @@ function renderCountryDetail(teamId) {
       <h3>Wedstrijden van ${t.name}</h3>
       <div class="matches">${teamMatches.map(m => {
         const h = byId[m.home], a = byId[m.away];
-        return `<article class="match"><div class="meta"><span>Groep ${m.group}</span><span>${fmt(m.date)}</span></div><div class="teams"><div>${h.flag} ${h.name}</div><span class="vs">VS</span><div>${a.flag} ${a.name}</div></div><div class="venue">🏟️ <a class="stadium-link" href="#stadion-${encodeURIComponent(m.venue)}">${m.venue}</a></div></article>`;
+        return `<article class="match"><div class="meta"><span>Groep ${m.group}</span><span>${fmt(m.date)}</span></div><div class="teams"><div>${h.flag} ${h.name}</div><span class="vs">VS</span><div>${a.flag} ${a.name}</div></div><div class="venue">🏟️ <button class="stadium-link stadium-open" type="button" data-stadium="${m.venue}">${m.venue}</button></div></article>`;
       }).join('')}</div>
     </div>`;
   document.querySelectorAll('.detail-section').forEach(s => s.classList.remove('active'));
@@ -282,10 +294,56 @@ function renderStadiumList() {
       <h3>${s.key}</h3>
       <p><b>${s.real}</b><br>${s.city}</p>
       <p class="venue">${count} groepswedstrijd(en) op deze site</p>
-      <a class="map-link" href="#stadion-${encodeURIComponent(s.key)}">Bekijk stadion</a>
+      <button class="map-link stadium-open" type="button" data-stadium="${s.key}">Bekijk stadion</button>
     </article>`;
   }).join('');
+  bindStadiumButtons();
 }
+function bindStadiumButtons() {
+  document.querySelectorAll('.stadium-open').forEach(btn => {
+    btn.onclick = () => openStadiumModal(btn.dataset.stadium);
+  });
+}
+function openStadiumModal(stadiumKey) {
+  const s = STADIUMS.find(x => x.key === stadiumKey);
+  if (!s) return;
+  const stadiumMatches = matches.filter(m => m.venue === s.key);
+  const content = document.querySelector('#stadiumModalContent');
+  content.innerHTML = `
+    <p class="kicker">WK stadion</p>
+    <h2 id="stadiumModalTitle">${s.real}</h2>
+    <p class="lead">${s.info}</p>
+    <div class="modal-grid">
+      <div class="modal-panel">
+        <h3>Stadiongegevens</h3>
+        <div class="modal-meta">
+          <div><b>WK naam</b><br>${s.key}</div>
+          <div><b>Stad</b><br>${s.city}</div>
+          <div><b>Capaciteit</b><br>${s.capacity}</div>
+          <div><b>Normale bespeler/gebruiker</b><br>${s.normal}</div>
+        </div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.query)}" target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+      <div class="modal-panel">
+        <h3>WK-wedstrijden hier</h3>
+        ${stadiumMatches.length ? stadiumMatches.map(m => {
+          const h = byId[m.home], a = byId[m.away];
+          return `<div class="team-row"><strong>${fmt(m.date)}</strong><span>${h.flag} ${h.name} vs ${a.flag} ${a.name}</span></div>`;
+        }).join('') : '<p class="venue">Geen groepswedstrijden gevonden in deze dataset.</p>'}
+      </div>
+    </div>`;
+  const modal = document.querySelector('#stadiumModal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-lock');
+}
+function closeStadiumModal() {
+  const modal = document.querySelector('#stadiumModal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-lock');
+}
+
 function renderStadiumDetail(key) {
   const decoded = decodeURIComponent(key);
   const s = STADIUMS.find(x => x.key === decoded);
@@ -331,10 +389,16 @@ function handleRoute() {
     renderStadiumDetail(hash.replace('#stadion-',''));
   }
 }
-
 document.querySelector('#groupFilter').addEventListener('change', renderMatches);
 document.querySelector('#search').addEventListener('input', renderMatches);
-renderGroups(); renderMatches(); renderPredictions(); renderStandings(); renderCheck(); renderStadiumList(); handleRoute(); countdown(); setInterval(countdown, 1000); window.addEventListener('hashchange', handleRoute);
+renderGroups(); renderMatches(); renderPredictions(); renderStandings(); renderCheck(); renderStadiumList(); handleRoute(); countdown(); setInterval(countdown, 1000); window.addEventListener('hashchange', handleRoute); document.querySelector('#stadiumModalClose').addEventListener('click', closeStadiumModal); document.querySelector('#stadiumModal').addEventListener('click', e => { if (e.target.id === 'stadiumModal') closeStadiumModal(); }); document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStadiumModal(); });
 </script>
+<div id="stadiumModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="stadiumModalTitle">
+    <button id="stadiumModalClose" class="modal-close" aria-label="Sluit pop-up">×</button>
+    <div id="stadiumModalContent"></div>
+  </div>
+</div>
+
 </body>
 </html>
